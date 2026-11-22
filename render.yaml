@@ -1,0 +1,66 @@
+
+services:
+  # MariaDB database
+  - type: pserv
+    name: snipeit-db
+    runtime: image
+    image:
+      url: docker.io/library/mariadb:11.4.7
+    region: frankfurt
+    plan: 1c-2g
+    disk:
+      name: mariadb-data
+      mountPath: /var/lib/mysql
+      sizeGB: 5
+    envVars:
+      - key: MARIADB_DATABASE
+        value: snipeit
+      - key: MARIADB_USER
+        sync: false
+      - key: MARIADB_PASSWORD
+        sync: false
+      - key: MARIADB_ROOT_PASSWORD
+        sync: false
+
+  # Snipe-IT application
+  - type: web
+    name: snipeit-app
+    runtime: image
+    image:
+      url: docker.io/snipe/snipe-it:latest
+    region: frankfurt
+    plan: 1c-2g
+    disk:
+      name: snipeit-storage
+      mountPath: /var/lib/snipeit
+      sizeGB: 5
+    envVars:
+      - key: PORT
+        value: "80"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: APP_TIMEZONE
+        value: Africa/Cairo
+      - key: APP_LOCALE
+        value: en-US
+      - key: DB_CONNECTION
+        value: mariadb
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: snipeit-db
+          property: host
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_DATABASE
+        value: snipeit
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
