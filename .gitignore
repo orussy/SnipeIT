@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+
+*.sql
+*.sql.gz
+*.tar
+*.tar.gz
+
+storage/
+database/
